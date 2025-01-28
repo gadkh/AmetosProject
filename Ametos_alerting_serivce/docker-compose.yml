@@ -18,6 +18,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - shared_network
 
   alerting_redis:
     image: redis:latest
@@ -32,6 +34,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - shared_network
 
   alerting_service:
     build: .
@@ -50,10 +54,32 @@ services:
       REDIS_PORT: 6379
       REDIS_DB: 0
     ports:
-      - "8000:8000"
+      - "8001:8000"
     command: [ "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload" ]
+    networks:
+      - shared_network
+
+  celery_worker:
+    build: .
+    container_name: celery_worker
+    restart: always
+    environment:
+      RUNNING_IN_DOCKER: True
+      DATABASE_URL: postgresql://user:password@alerting_db:5432/alert_db
+      REDIS_URL: redis://alerting_redis:6379/0
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+      REDIS_HOST: alerting_redis
+      REDIS_PORT: 6379
+      REDIS_DB: 0
+    command: ["celery", "-A", "app.workers.alert_worker", "worker", "--loglevel=info", "--queues=events"]
+    networks:
+      - shared_network
 
 
 volumes:
   alerting_db_data:
   alerting_redis_data:
+
+networks:
+  shared_network:
+    external: true

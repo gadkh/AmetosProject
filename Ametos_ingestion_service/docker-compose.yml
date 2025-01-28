@@ -60,6 +60,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - shared_network
 
   ingestion_redis:
     image: redis:latest
@@ -74,6 +76,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - shared_network
 
 
   rabbitmq:
@@ -91,6 +95,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - shared_network
 
   ingestion_service:
     build: .
@@ -114,8 +120,13 @@ services:
     ports:
       - "8000:8000"
     command: [ "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload" ]
+    networks:
+      - shared_network
 
 volumes:
   ingestion_db_data:
   ingestion_redis_data:
 
+networks:
+  shared_network:
+    external: true
