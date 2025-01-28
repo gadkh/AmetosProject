@@ -12,9 +12,26 @@ The system consists of two primary services:
 1. #### ingestion Service:
    - Responsible for receiving sensor events, validating them, and storing them in the database.
    - Sends the processed events to a message queue for further processing.
+   ##### Valid sensors
+| device_id | device_type       |
+|--------|-------------------|
+| AA:BB:CC:DD:EE:FF   | access_controller |
+| 11:22:33:44:55:66    | radar             |
+| 77:88:99:AA:BB:CC    | security_camera             |
+
+ 
 2. #### Alerting Service:
    - Listens to the message queue.
    - Generates alerts when certain conditions are met.
+   ##### Valid users
+
+| user_id           |
+|-------------------|
+| user123 | 
+| user456 |
+| user789 |
+| admin001 |
+
 
 ### System Components
 - Backend Framework: FastAPI (Python)
